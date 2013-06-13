@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Tweets</title>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  
+  <script src="//platform.twitter.com/widgets.js"></script>
+  <script src="/reqtweet/js/jquery.timeago.js"></script>
+  <!-- http://www.simonwhatley.co.uk/parsing-twitter-usernames-hashtags-and-urls-with-javascript -->
+  <script>String.prototype.parseURL=function(){return this.replace(/[A-Za-z]+:\/\/[A-Za-z0-9-_]+\.[A-Za-z0-9-_:%&~\?\/.=]+/g,function(url){return url.link(url);});};String.prototype.parseUsername=function(){return this.replace(/[@]+[A-Za-z0-9-_]+/g,function(u){var username=u.replace("@","")
+  return u.link("http://twitter.com/"+username);});};String.prototype.parseHashtag=function(){return this.replace(/[#]+[A-Za-z0-9-_]+/g,function(t){var tag=t.replace("#","%23")
+  return t.link("http://search.twitter.com/search?q="+tag);});};</script>
+	<script>
+	  $(function(){
+	    var data = {};
+	    data.screen_name = 'aphichat';
+	    data.count = 1;
+	    $.ajax({
+        type: 'POST',
+        ataType: 'json',
+        url: '/reqtweet/getTweets.php',
+        data: data,
+        success: function(data){
+          output = $.parseJSON(data);
+          var set = '';
+          $(output).each(function(index, data){
+            set += '<li><span class="tweet-item">'+output[index].text.parseURL().parseUsername().parseHashtag()+'</span> '+$.timeago(new Date(output[index].created_at))+' · <a href="https://twitter.com/intent/tweet?in_reply_to='+output[index].id+'">reply</a> · <a href="https://twitter.com/intent/retweet?tweet_id='+output[index].id_str+'">retweet</a> · <a href="https://twitter.com/intent/favorite?tweet_id='+output[index].id_str+'">favorite</a></li>';
+          });
+          $('#tweets ul').html(set);
+        }
+      });
+	  });
+	</script>
+</head>
+<body>
+  <div id="tweets">
+    <ul></ul>
+  </div>
+</body>
+</html>
